@@ -22,7 +22,7 @@ banks = [
 
 
 def process_libor_data(XM = '3M'):
-    from collections import defaultdict
+    """ select a rate-estimate column, by default the three monthly """ 
     libor_data = unicodecsv.DictReader(open('libor.csv'))
     data = []
     for d in libor_data:
@@ -31,36 +31,22 @@ def process_libor_data(XM = '3M'):
     col_sample = defaultdict(dict)
     for dp in data:
         if dp['Bank/Fixed'] in banks:
-        # col_sample[dp['Date']][dp['Bank/Fixed']] = {'Bank': dp['Bank/Fixed'], XM: dp[XM]}
             col_sample[dp['Date']][dp['Bank/Fixed']] = dp[XM]
 
-    return col_sample
+    row_data = []
+    for k,v in col_sample.items():
+        v.update({'date': k})
+        row_data.append(v)  
+
+    row_data.sort(key = lambda x: datetime.datetime.strptime(x['date'], '%d/%m/%Y'))
+
+    writer = unicodecsv.DictWriter(open('libor_data_%s.csv'%XM, 'w'), ['date'] + banks)
+    writer.writeheader()
+
+    for row in row_data:
+        writer.writerow(row)
 
 
-data_3M = process_libor_data()
-# for k, v in data_3M.items()[:100]:
-#     print k, v['FIX - USD'], v['Barclays']
-
-row_data = []
-for k,v in data_3M.items():
-    v.update({'date': k})
-    row_data.append(v)  
-
-
-print row_data[:10]
-    
-row_data.sort(key = lambda x: datetime.datetime.strptime(x['date'], '%d/%m/%Y'))
-
-print row_data[:100]
-
-# import json
-# json.dump(row_data, open('libor_data_3M.js', 'wb'))
-
-writer = unicodecsv.DictWriter(open('libor_data_3M.csv', 'w'), ['date'] + banks)
-
-writer.writeheader()
-
-for row in row_data:
-    writer.writerow(row)
+process_libor_data()
 
 
