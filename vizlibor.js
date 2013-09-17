@@ -50,6 +50,7 @@
 
         var banks = color.domain().map(function(name) {
             return {
+
                 name: name,
                 values: data.map(function(d) {
                     return {date: d.date, rate: +d[name]};
@@ -88,7 +89,7 @@
             .data(banks)
             .enter().append("g")
             .attr("class", "node")
-            .attr("transform", function(d,i){return "translate(" + 50 + "," + i*MAX_BANK_RADIUS + ")";});
+            .attr("transform", function(d,i){return "translate(" + width/2 + "," + i*MAX_BANK_RADIUS + ")";});
 
         node.append("circle")
             .attr("r", 4.5);
@@ -97,36 +98,63 @@
             .attr("dx", 12)
             .attr("dy", ".35em")
             .text(function(d) { return d.name; });
+
+        node.append("line")
+            .attr("stroke", function(d) { return color(d.name); })
+            .attr("x1", -40)
+            .attr("x2", -20);
         
         bank.append("path")
             .attr("class", "line")
             .attr("d", function(d) { return line(d.values); })
             .style("stroke", function(d) { return color(d.name); });
 
-        bank.append("text")
-            .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-            .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.rate) + ")"; })
-            .attr("x", 3)
-            .attr("dy", ".35em")
-            .text(function(d) { return d.name; });
+        // bank.append("text")
+        //     .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+        //     .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.rate) + ")"; })
+        //     .attr("x", 3)
+        //     .attr("dy", ".35em")
+        //     .text(function(d) { return d.name; });
         
-      line = svg.append("svg:line")
+      var time_line = svg.append("svg:line")
             .style('stroke', '#00e')
             .attr('y1', 0)
-            .attr('y2', height);
+            .attr('y2', height),
 
+       time_line_messages = [
+            {date: new Date('01-01-2005'), text: 'Between January 2005 and June 2009, Barclays derivatives traders made a total of 257 requests to fix Libor and Euribor rates, according to a report by the FSA.</p><p>One Barclays trader told a trader from another bank in relation to three-month dollar Libor: "duuuude... what\'s up with ur guys 34.5 3m fix... tell him to get it up!".'
+            },
+            {date: new Date('05-01-2007'), text: "At the onset of the financial crisis in September 2007 with the collapse of Northern Rock, liquidity concerns drew public scrutiny towards Libor. Barclays manipulated Libor submissions to give a healthier picture of the bank's credit quality and its ability to raise funds. A lower submission would deflect concerns it had problems borrowing cash from the markets."},
+            {date: new Date('11-28-2007'), text: 'On 28 November, a senior submitter at Barclays wrote in an internal email that "Libors are not reflecting the true cost of money", according to the FSA.</p><p>In early December, the CFTC said that the Barclays employee responsible for submitting the bank\'s dollar Libor rates contacted it to complain that Barclays was not setting "honest" rates.'},
+            // {date: new Date('12-10-2007'), text: 'In early December, the CFTC said that the Barclays employee responsible for submitting the bank\'s dollar Libor rates contacted it to complain that Barclays was not setting "honest" rates.'},
+            {date: new Date('04-01-2008'), text: 'In April the New York Fed queries a Barclays employee over Libor reporting.</p><p>The Wall Street Journal publishes the first article questioning the integrity of Libor.</p>'},
+            // {date: new Date('05-01-2008'), text: 'The Wall Street Journal publishes the first article questioning the integrity of Libor.'},
+           {date: new Date('07-01-2008'), text:  "Following the WSJ report, Barclays is contacted by the British Bankers' Association over concerns about the accuracy of its Libor submissions.</p><p>Later in the year, the Fed meets to begin inquiry. Fed boss Tim Geithner gives Bank of England governor Sir Mervyn King a note listing proposals to tackle Libor problems."},
+           {date: new Date('01-01-2012'), text: ''}
+       ],
+        time_line_index = 0;
+        
         var reposition = function(index){
-            var k, currentRate = data[index]['FIX - USD'],
-            RADIUS_WEIGHTING = 5.0;
+            var msg, k, currentRate = data[index]['FIX - USD'],
+            RADIUS_WEIGHTING = 5.0, d = data[index];
             
             if(index === 0){
                 resetAggregateTheft();
+                time_line_index = 0;
             }
-            line.attr('x1', x(data[index].date))
-                .attr('x2', x(data[index].date));
+
+            msg = time_line_messages[time_line_index];
+            if(d.date > msg.date){
+                time_line_index++;
+                $('#message-box').html('<p>' + msg.text + '</p>').hide().fadeIn(2000);
+            }
+             
+            time_line.attr('x1', x(d.date))
+                .attr('x2', x(d.date))
+                .transition(100);
 
             for(k in aggregateTheft){
-                aggregateTheft[k] += data[index][k] - currentRate;
+                aggregateTheft[k] += d[k] - currentRate;
             }
 
             node.select('circle')
@@ -152,7 +180,7 @@
                 window.setTimeout(ticker, 5000);
             }
             else{
-                window.setTimeout(ticker, 10);
+                window.setTimeout(ticker, 100);
             }
             
         };

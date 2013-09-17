@@ -5,7 +5,7 @@
       #viz {
       font: 10px sans-serif;
       background: #eee;
-      }
+      text-align: center;
       }
 
       .axis path,
@@ -24,13 +24,48 @@
       stroke: steelblue;
       stroke-width: 1.5px;
       }
+
+      #message-box{
+      padding: 40px;
+      }
+      
+      #message-box p{
+      font: 24px sans-serif;
+      line-height: 1.4;
+      font-weight: 200;
+      }
+      
+      .domain {
+      fill: none;
+      stroke: black;
+      stroke-width; 1;
+      } 
+      
     </style>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="//rawgithub.com/daniellmb/MinPubSub/master/minpubsub.js"></script>
   </head>
   <body>
-    <div id="viz"></div>
-    <script src="vizlibor.js"></script>
+    <div class='container'>
+      <h1>Visualizing the LIBOR Bank Theft</h1>
+      <p>The page shows a multi-line plot using the rather wonderful <a href="http://D3.org">D3</a> Javascript visualization library. The lines represent stated LIBOR estimates by the banks over the period Jan-2005 to Dec-2008, plotted against the actual rate (in red). As the blue line moves through time, the filled circles on the left represent the aggregate difference between the individual bank estimates and the actual value. Red circles show an over-estimate, green an under. Roughly speaking, the greater these differentials the more money the banks could potential steal.
+      </p>
+      <p>
+      Over the critical period of 2007-08, Barclay's LIBOR numbers were widely different from the actual figures, allowing them to manipulate the LIBOR rate and make bets on that change. 
+      </p>
+      <p>
+      For a good summary of the LIBOR scandal, on-going fixes etc. <a href="http://www.rollingstone.com/politics/news/everything-is-rigged-the-biggest-financial-scandal-yet-20130425">Matt Taibbi's Rolling Stone articles</a> are a pungent, if depressing read
+      </p>
+      <p>
+      This is a multi-trillion dollar market so even small manipulations can make big money. Conservative estimates put losses to us all in the tens of billions. As usual, no bankers went to prison and business continues pretty much as usual...
+      </p>      
+      <div id="viz"></div>
+      <div id="message-box">This is a Message Box</div>
+      <script src="vizlibor.js"></script>
+    </div>
   </body>
 </html>
 
